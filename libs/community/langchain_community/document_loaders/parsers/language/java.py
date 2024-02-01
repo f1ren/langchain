@@ -32,6 +32,11 @@ class JavaSegmenter(CodeSegmenter):
         location = self._find_location(position.line, position.column)
         code_tail = self.code[location:]
         block_start = code_tail.find('{') + 1
+
+        semicolon = code_tail.find(';')
+        if 0 <= semicolon < block_start - 1:
+            return code_tail[:semicolon + 1]
+
         braces_counter = 1
         for i, c in enumerate(code_tail[block_start:]):
             if c == '{':
@@ -40,49 +45,32 @@ class JavaSegmenter(CodeSegmenter):
                 braces_counter -= 1
             if braces_counter == 0:
                 break
+
         return code_tail[:block_start + i + 1]
 
-    def extract_functions_classes(self) -> List[str]:
+    def _list_children(self):
+        children = []
         tree = javalang.parse.parse(self.code)
-        segments = []
         for child_list in tree.children:
             if child_list is None:
                 continue
             for child in child_list:
-                segments.append(self._extract_segment_by_braces(child.position))
+                children.append(child)
 
-        return segments
+        return children
+
+    def extract_functions_classes(self) -> List[str]:
+        return [self._extract_segment_by_braces(child.position) for child in self._list_children()]
 
     def simplify_code(self) -> str:
-        simplified_lines: List[str] = []
-        inside_relevant_section = False
-        omitted_code_added = (
-            False  # To track if "* OMITTED CODE *" has been added after the last header
-        )
+        simplified_lines = self.code.splitlines()[:]
 
-        for line in self.source_lines:
-            is_header = (
-                "PROCEDURE DIVISION" in line
-                or "DATA DIVISION" in line
-                or "IDENTIFICATION DIVISION" in line
-                or self.PARAGRAPH_PATTERN.match(line.strip().split(" ")[0])
-                or self.SECTION_PATTERN.match(line.strip())
-            )
+        for child in self._list_children():
+            # TODO
+            pass
+            # simplified_lines[start] = f"// Code for: {simplified_lines[start]}"
+            #
+            # for line_num in range(start + 1, node.loc.end.line):
+            #     simplified_lines[line_num] = None  # type: ignore
 
-            if is_header:
-                inside_relevant_section = True
-                # Reset the flag since we're entering a new section/division or
-                # paragraph
-                omitted_code_added = False
-
-            if inside_relevant_section:
-                if is_header:
-                    # Add header and reset the omitted code added flag
-                    simplified_lines.append(line)
-                elif not omitted_code_added:
-                    # Add omitted code comment only if it hasn't been added directly
-                    # after the last header
-                    simplified_lines.append("* OMITTED CODE *")
-                    omitted_code_added = True
-
-        return "\n".join(simplified_lines)
+        return "\n".join(line for line in simplified_lines if line is not None)

@@ -5,7 +5,9 @@ from libs.community.langchain_community.document_loaders.parsers.language.java i
 
 class TestJavaSegmenter(unittest.TestCase):
     def setUp(self) -> None:
-        self.example_code = """class Hello
+        self.example_code = """import java.util.Scanner;
+// My Hello class
+class Hello
 {
     public static void main(String[] args)
     {
@@ -27,6 +29,7 @@ enum Tens
 // Code for: enum Tens"""
 
         self.expected_extracted_code = [
+            "import java.util.Scanner;",
             "class Hello\n{\n    public static void main(String[] args)\n    {\n        "
             'System.out.println("Hello, world.");\n    }\n}',
             "interface Human\n{\n    void breathe();\n}",
