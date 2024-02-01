@@ -11,6 +11,7 @@ from langchain_community.document_loaders.parsers.language.javascript import (
     JavaScriptSegmenter,
 )
 from langchain_community.document_loaders.parsers.language.python import PythonSegmenter
+from langchain_community.document_loaders.parsers.language.java import JavaSegmenter
 
 if TYPE_CHECKING:
     from langchain.text_splitter import Language
@@ -22,12 +23,14 @@ try:
         "py": Language.PYTHON,
         "js": Language.JS,
         "cobol": Language.COBOL,
+        "java": Language.JAVA,
     }
 
     LANGUAGE_SEGMENTERS: Dict[str, Any] = {
         Language.PYTHON: PythonSegmenter,
         Language.JS: JavaScriptSegmenter,
         Language.COBOL: CobolSegmenter,
+        Language.JAVA: JavaSegmenter,
     }
 except ImportError:
     LANGUAGE_EXTENSIONS = {}
