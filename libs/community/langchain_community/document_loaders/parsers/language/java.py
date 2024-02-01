@@ -3,6 +3,7 @@ from typing import List
 import javalang
 from javalang.parser import JavaSyntaxError
 from javalang.tokenizer import Position
+from javalang.tree import Import
 
 from langchain_community.document_loaders.parsers.language.code_segmenter import (
     CodeSegmenter,
@@ -55,6 +56,8 @@ class JavaSegmenter(CodeSegmenter):
             if child_list is None:
                 continue
             for child in child_list:
+                if isinstance(child, Import):
+                    continue
                 children.append(child)
 
         return children

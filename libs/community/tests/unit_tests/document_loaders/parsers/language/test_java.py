@@ -29,7 +29,6 @@ enum Tens
 // Code for: enum Tens"""
 
         self.expected_extracted_code = [
-            "import java.util.Scanner;",
             "class Hello\n{\n    public static void main(String[] args)\n    {\n        "
             'System.out.println("Hello, world.");\n    }\n}',
             "interface Human\n{\n    void breathe();\n}",
