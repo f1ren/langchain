@@ -24,7 +24,9 @@ enum Tens
     TWENTY
 }"""
 
-        self.expected_simplified_code = """// Code for: class Hello
+        self.expected_simplified_code = """import java.util.Scanner;
+// My Hello class
+// Code for: class Hello
 // Code for: interface Human
 // Code for: enum Tens"""
 

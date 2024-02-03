@@ -69,11 +69,12 @@ class JavaSegmenter(CodeSegmenter):
         simplified_lines = self.code.splitlines()[:]
 
         for child in self._list_children():
-            # TODO
-            pass
-            # simplified_lines[start] = f"// Code for: {simplified_lines[start]}"
-            #
-            # for line_num in range(start + 1, node.loc.end.line):
-            #     simplified_lines[line_num] = None  # type: ignore
+            simplified_lines[child.position.line - 1] = f"// Code for: {simplified_lines[child.position.line - 1]}"
+
+            segment = self._extract_segment_by_braces(child.position)
+            lines_count = segment.count('\n') + 1
+
+            for line_num in range(child.position.line, child.position.line + lines_count - 1):
+                simplified_lines[line_num] = None  # type: ignore
 
         return "\n".join(line for line in simplified_lines if line is not None)
