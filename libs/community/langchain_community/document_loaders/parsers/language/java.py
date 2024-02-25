@@ -3,7 +3,7 @@ from typing import List
 import javalang
 from javalang.parser import JavaSyntaxError
 from javalang.tokenizer import Position
-from javalang.tree import Import
+from javalang.tree import Import, PackageDeclaration
 
 from langchain_community.document_loaders.parsers.language.code_segmenter import (
     CodeSegmenter,
@@ -55,7 +55,11 @@ class JavaSegmenter(CodeSegmenter):
         for child_list in tree.children:
             if child_list is None:
                 continue
+            # TODO: Don't ignore!
+            if isinstance(child_list, PackageDeclaration):
+                continue
             for child in child_list:
+                # TODO: Don't ignore!
                 if isinstance(child, Import):
                     continue
                 children.append(child)
@@ -66,7 +70,7 @@ class JavaSegmenter(CodeSegmenter):
         return [self._extract_segment_by_braces(child.position) for child in self._list_children()]
 
     def simplify_code(self) -> str:
-        simplified_lines = self.code.splitlines()[:]
+        simplified_lines = self.code.splitlines()[:] + ['']
 
         for child in self._list_children():
             simplified_lines[child.position.line - 1] = f"// Code for: {simplified_lines[child.position.line - 1]}"
